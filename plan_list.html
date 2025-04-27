@@ -2470,7 +2470,7 @@
             border-radius: 12px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.15);
             padding: 20px;
-            width: 320px;
+            width: 350px;
             z-index: 1000;
             transition: all 0.3s ease;
             opacity: 0;
@@ -2512,31 +2512,24 @@
             margin-bottom: 15px;
         }
         
-        .feedback-modal-options {
+        /* 星级评分样式 */
+        .star-rating {
             display: flex;
-            gap: 10px;
+            justify-content: center;
             margin-bottom: 15px;
         }
         
-        .feedback-option {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            text-align: center;
+        .star-rating .star {
+            font-size: 24px;
+            color: #e0e0e0;
             cursor: pointer;
             transition: all 0.2s;
+            margin: 0 5px;
         }
         
-        .feedback-option:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-        
-        .feedback-option.selected {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .star-rating .star:hover,
+        .star-rating .star.active {
+            color: #FFB400;
         }
         
         .feedback-reason-options {
@@ -2574,6 +2567,21 @@
             border-color: var(--primary-color);
         }
         
+        .feedback-textarea-container {
+            margin-top: 15px;
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+        }
+        
+        .feedback-textarea-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
         .feedback-textarea {
             width: 100%;
             min-height: 80px;
@@ -2584,9 +2592,6 @@
             font-size: 14px;
             resize: vertical;
             transition: all 0.3s;
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
         }
         
         .feedback-textarea:focus {
@@ -2596,25 +2601,31 @@
         }
         
         .feedback-modal-footer {
-            text-align: right;
+            text-align: center;
+            margin-top: 20px;
         }
         
         .feedback-btn {
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             transition: all 0.2s;
             border: none;
+            width: 100%;
+            font-weight: 500;
         }
         
         .feedback-btn-primary {
             background-color: var(--primary-color);
             color: white;
+            box-shadow: 0 4px 10px rgba(24, 144, 255, 0.25);
         }
         
         .feedback-btn-primary:hover {
             background-color: #40a9ff;
+            box-shadow: 0 6px 15px rgba(24, 144, 255, 0.35);
+            transform: translateY(-2px);
         }
         
         .feedback-btn-default {
@@ -2722,29 +2733,33 @@
     <!-- 添加评价弹框 -->
     <div id="feedbackModal" class="feedback-modal">
         <div class="feedback-modal-header">
-            <div class="feedback-modal-title">您是否满意推荐的方案？</div>
+            <div class="feedback-modal-title">请为推荐的方案打分</div>
             <div class="feedback-modal-close"><i class="fas fa-times"></i></div>
         </div>
         <div class="feedback-modal-body">
-            <div class="feedback-modal-options">
-                <div class="feedback-option" data-value="yes">是</div>
-                <div class="feedback-option" data-value="no">否</div>
+            <div class="star-rating">
+                <span class="star" data-value="1"><i class="fas fa-star"></i></span>
+                <span class="star" data-value="2"><i class="fas fa-star"></i></span>
+                <span class="star" data-value="3"><i class="fas fa-star"></i></span>
+                <span class="star" data-value="4"><i class="fas fa-star"></i></span>
+                <span class="star" data-value="5"><i class="fas fa-star"></i></span>
             </div>
             <div class="feedback-reason-options">
                 <div class="feedback-reason" data-value="info-inaccurate">院校信息不准</div>
                 <div class="feedback-reason" data-value="background-mismatch">推荐院校不准</div>
                 <div class="feedback-reason" data-value="complex-process">流程复杂</div>
-                <div class="feedback-reason" data-value="other">其他原因</div>
             </div>
-            <textarea id="feedbackText" class="feedback-textarea" placeholder="请详细描述您的建议，帮助我们改进服务..."></textarea>
+            <div class="feedback-textarea-container">
+                <label class="feedback-textarea-label">其他反馈：</label>
+                <textarea id="feedbackText" class="feedback-textarea" placeholder="请详细描述您的建议，帮助我们改进服务..."></textarea>
+            </div>
             <div class="feedback-success">
                 <i class="fas fa-check-circle"></i>
                 感谢您的反馈，小希已经记住啦，将持续优化服务~
             </div>
         </div>
         <div class="feedback-modal-footer">
-            <button class="feedback-btn feedback-btn-default feedback-cancel">取消</button>
-            <button class="feedback-btn feedback-btn-primary feedback-submit">提交</button>
+            <button class="feedback-btn feedback-btn-primary feedback-submit">提交反馈</button>
         </div>
     </div>
 
@@ -5153,40 +5168,68 @@
         function initFeedbackModal() {
             const feedbackModal = document.getElementById('feedbackModal');
             const closeBtn = feedbackModal.querySelector('.feedback-modal-close');
-            const cancelBtn = feedbackModal.querySelector('.feedback-cancel');
             const submitBtn = feedbackModal.querySelector('.feedback-submit');
-            const options = feedbackModal.querySelectorAll('.feedback-option');
+            const stars = feedbackModal.querySelectorAll('.star');
             const reasonOptions = feedbackModal.querySelector('.feedback-reason-options');
             const reasons = feedbackModal.querySelectorAll('.feedback-reason');
+            const textareaContainer = feedbackModal.querySelector('.feedback-textarea-container');
             const textarea = document.getElementById('feedbackText');
             const successMsg = feedbackModal.querySelector('.feedback-success');
             
-            // 选择满意度选项事件绑定
-            options.forEach(option => {
-                option.addEventListener('click', function() {
-                    // 移除所有选项的选中状态
-                    options.forEach(opt => opt.classList.remove('selected'));
+            let currentRating = 0;
+            
+            // 星级评分事件绑定
+            stars.forEach((star, index) => {
+                star.addEventListener('mouseenter', function() {
+                    // 鼠标悬停时，当前星及之前的星都高亮
+                    for (let i = 0; i <= index; i++) {
+                        stars[i].classList.add('hover');
+                    }
+                });
+                
+                star.addEventListener('mouseleave', function() {
+                    // 鼠标离开时，移除所有hover状态
+                    stars.forEach(s => s.classList.remove('hover'));
+                });
+                
+                star.addEventListener('click', function() {
+                    // 设置当前评分
+                    currentRating = parseInt(this.dataset.value);
                     
-                    // 设置当前选项为选中状态
-                    this.classList.add('selected');
+                    // 更新星星显示状态
+                    stars.forEach((s, i) => {
+                        if (i < currentRating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
                     
-                    // 如果选择"否"，显示原因选项
-                    if (this.dataset.value === 'no') {
+                    // 如果评分低于5星，显示原因选项和反馈文本框
+                    if (currentRating < 5) {
                         reasonOptions.style.display = 'flex';
-                        // 重置原因选项和文本框
-                        reasons.forEach(reason => reason.classList.remove('selected'));
-                        textarea.style.display = 'none';
+                        textareaContainer.style.display = 'block';
                         
                         // 添加动画效果
                         setTimeout(() => {
                             reasonOptions.style.opacity = '1';
                             reasonOptions.style.transform = 'translateY(0)';
+                            textareaContainer.style.opacity = '1';
+                            textareaContainer.style.transform = 'translateY(0)';
                         }, 10);
+                        
+                        // 重置选择状态
+                        reasons.forEach(reason => reason.classList.remove('selected'));
                     } else {
+                        // 5星评价，隐藏原因选项，只显示提交按钮
                         reasonOptions.style.display = 'none';
                         reasonOptions.style.opacity = '0';
-                        reasonOptions.style.transform = 'translateY(10px)';
-                        textarea.style.display = 'none';
+                        textareaContainer.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            textareaContainer.style.opacity = '1';
+                            textareaContainer.style.transform = 'translateY(0)';
+                        }, 10);
                     }
                 });
             });
@@ -5194,82 +5237,51 @@
             // 选择原因选项事件绑定
             reasons.forEach(reason => {
                 reason.addEventListener('click', function() {
-                    // 移除所有原因选项的选中状态
-                    reasons.forEach(r => r.classList.remove('selected'));
-                    
-                    // 设置当前原因为选中状态
-                    this.classList.add('selected');
-                    
-                    // 如果选择"其他"，显示文本框
-                    if (this.dataset.value === 'other') {
-                        textarea.style.display = 'block';
-                        textarea.focus();
-                        
-                        // 添加动画效果
-                        setTimeout(() => {
-                            textarea.style.opacity = '1';
-                            textarea.style.transform = 'translateY(0)';
-                        }, 10);
-                    } else {
-                        textarea.style.display = 'none';
-                        textarea.style.opacity = '0';
-                        textarea.style.transform = 'translateY(10px)';
-                    }
+                    // 切换当前选项的选中状态
+                    this.classList.toggle('selected');
                 });
             });
             
             // 关闭弹框事件绑定
             closeBtn.addEventListener('click', closeFeedbackModal);
-            cancelBtn.addEventListener('click', closeFeedbackModal);
             
             // 提交反馈事件绑定
             submitBtn.addEventListener('click', function() {
-                const selectedOption = feedbackModal.querySelector('.feedback-option.selected');
-                
-                // 如果没有选择选项，提示用户
-                if (!selectedOption) {
-                    showToast('请选择是否满意推荐的方案');
+                // 如果没有评分，提示用户
+                if (currentRating === 0) {
+                    showToast('请先为推荐的方案打分');
                     return;
                 }
                 
-                // 获取选择的值
-                const value = selectedOption.dataset.value;
-                let reason = '';
-                let otherFeedback = '';
-                
-                // 如果选择"否"，需要有原因
-                if (value === 'no') {
-                    const selectedReason = feedbackModal.querySelector('.feedback-reason.selected');
-                    if (!selectedReason) {
-                        showToast('请选择不满意的原因');
+                // 如果评分低于5星，但没有选择原因，提示用户
+                if (currentRating < 5) {
+                    const selectedReasons = Array.from(reasons).filter(r => r.classList.contains('selected'));
+                    if (selectedReasons.length === 0 && textarea.value.trim() === '') {
+                        showToast('请选择不满意的原因或填写反馈');
                         return;
                     }
-                    
-                    reason = selectedReason.dataset.value;
-                    
-                    // 如果选择"其他"，需要填写具体原因
-                    if (reason === 'other' && textarea.value.trim() === '') {
-                        showToast('请填写具体原因');
-                        textarea.focus();
-                        return;
-                    }
-                    
-                    otherFeedback = textarea.value;
                 }
+                
+                // 获取选择的值
+                const selectedReasons = Array.from(reasons)
+                    .filter(r => r.classList.contains('selected'))
+                    .map(r => r.dataset.value);
+                
+                // 获取文本反馈
+                const otherFeedback = textarea.value.trim();
                 
                 // 这里可以添加发送反馈到服务器的代码
                 console.log('用户反馈:', {
-                    satisfaction: value,
-                    reason: reason,
+                    rating: currentRating,
+                    reasons: selectedReasons,
                     otherFeedback: otherFeedback
                 });
                 
                 // 隐藏主体内容，显示成功消息
-                feedbackModal.querySelector('.feedback-modal-options').style.display = 'none';
+                feedbackModal.querySelector('.star-rating').style.display = 'none';
                 reasonOptions.style.display = 'none';
-                textarea.style.display = 'none';
+                textareaContainer.style.display = 'none';
                 submitBtn.style.display = 'none';
-                cancelBtn.style.display = 'none';
                 
                 // 显示成功消息
                 successMsg.style.display = 'block';
@@ -5286,13 +5298,25 @@
                     
                     // 重置弹框状态，以便下次使用
                     setTimeout(function() {
-                        feedbackModal.querySelector('.feedback-modal-options').style.display = 'flex';
-                        submitBtn.style.display = 'inline-block';
-                        cancelBtn.style.display = 'inline-block';
+                        feedbackModal.querySelector('.star-rating').style.display = 'flex';
+                        submitBtn.style.display = 'block';
                         successMsg.style.display = 'none';
                         successMsg.style.opacity = '0';
                         successMsg.style.transform = 'scale(0.9)';
-                        options.forEach(opt => opt.classList.remove('selected'));
+                        
+                        // 重置星级评分
+                        currentRating = 0;
+                        stars.forEach(s => s.classList.remove('active'));
+                        
+                        // 重置原因选择和文本框
+                        reasonOptions.style.opacity = '0';
+                        reasonOptions.style.transform = 'translateY(10px)';
+                        reasonOptions.style.display = 'none';
+                        textareaContainer.style.opacity = '0';
+                        textareaContainer.style.transform = 'translateY(10px)';
+                        textareaContainer.style.display = 'none';
+                        reasons.forEach(reason => reason.classList.remove('selected'));
+                        textarea.value = '';
                     }, 300);
                 }, 3000);
             });
