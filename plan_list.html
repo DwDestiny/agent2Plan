@@ -4853,8 +4853,6 @@
              otherSection.appendChild(createFormField('校区', 'campus', planData.campus, 'text'));
              otherSection.appendChild(createFormField('申请建议', 'apply_suggestion', planData.apply_suggestion, 'textarea'));
              otherSection.appendChild(createFormField('详情页链接', 'detail_url', planData.detail_url, 'text'));
-             otherSection.appendChild(createFormField('专业介绍', 'intro', planData.intro, 'textarea'));
-             otherSection.appendChild(createFormField('院校介绍', 'school_intro', planData.school_intro, 'textarea'));
              form.appendChild(otherSection);
              // --- End Form Sections ---
 
@@ -5092,8 +5090,6 @@
                      setValue('.secondary-info-section .campus', getFormValue('campus'));
                      setValue('.secondary-info-section .apply-suggestion', getFormValue('apply_suggestion'));
                      setValue('.secondary-info-section .detail-url', getFormValue('detail_url'));
-                     setValue('.secondary-info-section .intro', getFormValue('intro'));
-                     setValue('.secondary-info-section .school-intro', getFormValue('school_intro'));
                  } else {
                       console.warn("Secondary info section not found in schoolItem for saving.");
                  }
